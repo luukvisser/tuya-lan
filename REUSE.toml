@@ -1,0 +1,11 @@
+version = 1
+
+# The whole module is MIT: most of it is ported from Leonard Pitzu's
+# leonardpitzu/aventproxy, a fork of Andrea Cervesato's thekoma/aventproxy,
+# whose MIT notice is kept, with parts of thekoma/aventproxy's own pkg/lan;
+# the changes and additions are Luuk Visser's, under the same licence.
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = ["2026 thekoma", "2026 Andrea Cervesato", "2026 Leonard Pitzu", "2026 Luuk Visser"]
+SPDX-License-Identifier = "MIT"

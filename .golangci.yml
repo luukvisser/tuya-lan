@@ -1,0 +1,18 @@
+version: "2"
+
+linters:
+  # The standard set (errcheck, govet, ineffassign, staticcheck, unused) plus a
+  # few that catch real mistakes without style opinions. gosec is left out: the
+  # protocol itself requires MD5, SHA-1 and AES-ECB, which it would flag throughout.
+  enable:
+    - errorlint
+    - misspell
+    - unconvert
+  exclusions:
+    # Unchecked Close and similar calls whose error has nowhere useful to go.
+    presets:
+      - std-error-handling
+
+formatters:
+  enable:
+    - gofmt

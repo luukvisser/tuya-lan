@@ -1,0 +1,27 @@
+# Weekly update PRs, one per ecosystem, for releases at least two weeks old.
+# Not covered, updated by hand: the tool versions in the workflows (golangci-lint,
+# staticcheck, govulncheck, actionlint, zizmor, gitleaks), pinned there by version
+# and image digest.
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    groups:
+      go:
+        patterns: ["*"]
+    open-pull-requests-limit: 3
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    groups:
+      actions:
+        patterns: ["*"]
+    open-pull-requests-limit: 3
