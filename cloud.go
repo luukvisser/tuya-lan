@@ -81,7 +81,7 @@ func (c *Client) startCloud(ctx context.Context) error {
 
 	frames, err := sig.Open(offer.SessionID)
 	if err != nil {
-		return fmt.Errorf("%w: %v", ErrOfferNotSent, err)
+		return fmt.Errorf("%w: %w", ErrOfferNotSent, err)
 	}
 	// Held before the offer goes out, so any later failure, and Close, tell
 	// the camera to drop the session before the next one starts.
@@ -94,7 +94,7 @@ func (c *Client) startCloud(ctx context.Context) error {
 		return err
 	}
 	if err := sig.Send(offer.OfferFrame()); err != nil {
-		return fmt.Errorf("%w: %v", ErrOfferNotSent, err)
+		return fmt.Errorf("%w: %w", ErrOfferNotSent, err)
 	}
 
 	port := sock.LocalAddr().(*net.UDPAddr).Port
@@ -124,12 +124,12 @@ func (c *Client) startCloud(ctx context.Context) error {
 	defer cancel()
 	peer, err := iceConnect(iceCtx, sock, signals.snapshot, local, remote)
 	if err != nil {
-		return fmt.Errorf("%w: %v", ErrICE, err)
+		return fmt.Errorf("%w: %w", ErrICE, err)
 	}
 	c.Host = peer.IP.String()
 	debugf("tuyalan: %s answered over the cloud, ICE peer %s", c.DeviceID, peer)
 	if err := c.startStream(ctx, sock, peer, local, aesKey, false); err != nil {
-		return fmt.Errorf("%w: %v", ErrLogin, err)
+		return fmt.Errorf("%w: %w", ErrLogin, err)
 	}
 	signals.live.Store(true)
 	if signals.isEnded() { // the disconnect came in between: pump did not report it
@@ -247,7 +247,7 @@ func (s *cloudSignals) awaitAnswer(ctx context.Context) (iceCreds, []byte, error
 	case <-s.ended:
 		return iceCreds{}, nil, ErrRefused
 	case <-ctx.Done():
-		return iceCreds{}, nil, fmt.Errorf("%w: %v", ErrNoAnswer, ctx.Err())
+		return iceCreds{}, nil, fmt.Errorf("%w: %w", ErrNoAnswer, ctx.Err())
 	}
 	remote := iceCreds{Ufrag: sdpAttr(answer.Msg.SDP, "ice-ufrag"), Pwd: sdpAttr(answer.Msg.SDP, "ice-pwd")}
 	if remote.Ufrag == "" || remote.Pwd == "" {
@@ -268,7 +268,7 @@ func (s *cloudSignals) awaitPeer(ctx context.Context) error {
 		case <-s.ended:
 			return ErrRefused
 		case <-ctx.Done():
-			return fmt.Errorf("%w: %v", ErrNoCandidate, ctx.Err())
+			return fmt.Errorf("%w: %w", ErrNoCandidate, ctx.Err())
 		}
 	}
 	return nil

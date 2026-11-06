@@ -104,7 +104,7 @@ func TestAwaitReply(t *testing.T) {
 	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Millisecond)
 	defer cancel()
 	r.err = nil
-	if _, err := awaitReply(ctx, r, buf, time.Hour); err != nil || r.deadline.Sub(time.Now()) > time.Second {
+	if _, err := awaitReply(ctx, r, buf, time.Hour); err != nil || time.Until(r.deadline) > time.Second {
 		t.Fatalf("deadline not capped by ctx: %v", err)
 	}
 }
