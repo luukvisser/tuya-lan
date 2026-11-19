@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Weekly: new advisories for unchanged code (govulncheck, trivy, zizmor, gitleaks);
+  # lint, tests and licences only run when the code changes.
+  schedule:
+    - cron: "17 5 * * 1"  # Mondays 05:17 UTC
 
 # Read the repository, nothing else; no job asks for more.
 permissions:
@@ -16,6 +20,7 @@ concurrency:
 jobs:
   lint:
     name: Lint (gofmt, vet, golangci-lint, staticcheck)
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -53,8 +58,26 @@ jobs:
       - name: govulncheck v1.9.0
         run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
 
+  trivy:
+    name: Vulnerabilities (trivy, reported)
+    # Reported, not blocking: trivy matches every module in go.mod, reachable or not;
+    # govulncheck above is the blocking check. The table shows in the run.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    continue-on-error: ${{ github.event_name != 'schedule' }}  # reports on push/PR; the weekly run fails so GitHub mails
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - name: trivy 0.76.2
+        run: >-
+          docker run --rm -v "$PWD:/src:ro"
+          aquasec/trivy:0.76.2@sha256:8f6bb947dbc528902e11f2f5be52f7b519f6a39d5d148f41166f2040499768fb
+          fs --quiet --scanners vuln --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1 /src
+
   test:
     name: Tests (Go ${{ matrix.go }})
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     strategy:
@@ -73,6 +96,7 @@ jobs:
   licences:
     name: Licences (reuse lint)
     # Every file has a copyright and licence statement (REUSE.toml, LICENSES/).
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:

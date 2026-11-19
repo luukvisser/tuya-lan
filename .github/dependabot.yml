@@ -1,5 +1,5 @@
 # Weekly update PRs, one per ecosystem, for releases at least two weeks old.
-# Not covered, updated by hand: the tool versions in the workflows (golangci-lint,
+# Not covered, updated by hand: the tool versions in the workflows (golangci-lint, trivy,
 # staticcheck, govulncheck, actionlint, zizmor, gitleaks), pinned there by version
 # and image digest.
 version: 2
